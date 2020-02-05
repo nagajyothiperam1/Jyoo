@@ -1,34 +1,32 @@
 pipeline {
     agent any
     stages {
-	stage('load'){
-	    steps{
-		script{
-		sh "ansible-playbook apache.yml"
+		stage('mail'){
+			steps{
+				emailext body: 'test!!!!!!!!!!', subject: 'Job Started', to: 'nagajyothiperam@gmail.com'
+            }
 		}
-	    }
-	}
+		stage('load'){
+			steps{
+				script{
+					sh "ansible-playbook apache.yml"
+				}
+			}
+		}
         
     }
 	post {   
-         success {  
-              mail body: "<b>ansible sample</b>
-			 <br>Project: ${env.JOB_NAME} 
-			 <br>Build Number: ${env.BUILD_NUMBER}
-			 <br> URL de build: ${env.BUILD_URL}", 
-			 charset: 'UTF-8', mimeType: 'text/html',
-			 subject: "SUCCESS CI: Project name -> ${env.JOB_NAME}",
-			 to: "nagajyothiperam@gmail.com";    
-         }  
-         failure { 
-				
-             mail body: "<b>ansible sample</b>
-			 <br>Project: ${env.JOB_NAME} 
-			 <br>Build Number: ${env.BUILD_NUMBER}
-			 <br> URL de build: ${env.BUILD_URL}", 
-			 charset: 'UTF-8', mimeType: 'text/html',
-			 subject: "ERROR CI: Project name -> ${env.JOB_NAME}",
-			 to: "nagajyothiperam@gmail.com";  
-         }  
+        success {  
+            emailext ( subject: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+            body: """<p>SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+			console output: <a href="${env.BUILD_URL}/console">${env.JOB_NAME} _${env.BUILD_NUMBER}</a>""",
+			to: "nagajyothiperam@gmail.com",   
+        }  
+        failure { 
+	        emailext ( subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+            body: """<p>FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+			console output: <a href="${env.BUILD_URL}/console">${env.JOB_NAME} _${env.BUILD_NUMBER}</a>""",
+			to: "nagajyothiperam@gmail.com", 
+        }  
     }  
 }
