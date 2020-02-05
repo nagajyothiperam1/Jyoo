@@ -9,7 +9,7 @@ pipeline {
 		stage('load'){
 			steps{
 				script{
-					sh "ansible-playbook apache.yml"
+					sh "ansible-playbook sample_ansible.yml"
 				}
 			}
 		}
